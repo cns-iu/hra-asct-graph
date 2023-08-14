@@ -2,7 +2,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX part_of: <http://purl.obolibrary.org/obo/BFO_0000050>
 PREFIX overlaps: <http://purl.obolibrary.org/obo/RO_0002131>
 
-SELECT DISTINCT ?source ?target ?type
+SELECT DISTINCT ?source ?target ?source_label ?type ?target_label
 WHERE {
   VALUES (?type_iri ?type ) {
     ( part_of: 'part of' )
@@ -11,6 +11,8 @@ WHERE {
   }
 
   ?source_iri ?type_iri ?target_iri .
+  ?source_iri rdfs:label ?source_label .
+  ?target_iri rdfs:label ?target_label .
 
   BIND(REPLACE(REPLACE(STR(?source_iri), "http://purl.obolibrary.org/obo/", ""), "_", ":") as ?source)
   BIND(REPLACE(REPLACE(STR(?target_iri), "http://purl.obolibrary.org/obo/", ""), "_", ":") as ?target)
