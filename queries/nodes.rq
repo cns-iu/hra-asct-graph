@@ -1,0 +1,10 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX part_of: <http://purl.obolibrary.org/obo/BFO_0000050>
+
+SELECT DISTINCT ?id ?label
+WHERE {
+  ?iri rdfs:label ?label .
+
+  BIND(REPLACE(REPLACE(STR(?iri), "http://purl.obolibrary.org/obo/", ""), "_", ":") as ?id)
+}
+ORDER BY ?id

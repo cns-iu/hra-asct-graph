@@ -1,0 +1,82 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX part_of: <http://purl.obolibrary.org/obo/BFO_0000050>
+PREFIX overlaps: <http://purl.obolibrary.org/obo/RO_0002131>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX cl_owl: <http://purl.obolibrary.org/obo/cl.owl>
+PREFIX pcl_owl: <http://purl.obolibrary.org/obo/pcl.owl>
+PREFIX uberon_owl: <http://purl.obolibrary.org/obo/uberon.owl>
+
+CONSTRUCT {
+  ?as_child part_of: ?as_parent .
+  ?ct overlaps: ?as_child .
+  ?ct_child rdfs:subClassOf ?ct_parent .
+
+  ?as_child rdfs:label ?as_child_label .
+  ?as_parent rdfs:label ?as_parent_label .
+  ?ct rdfs:label ?ct_label .
+  ?ct_child rdfs:label ?ct_child_label .
+  ?ct_parent rdfs:label ?ct_parent_label .
+
+  ?ontology owl:versionIRI ?ontologyVersionIri .
+}
+WHERE {
+  {
+    SELECT DISTINCT ?ontology ?ontologyVersionIri WHERE {
+      VALUES (?ontology) {
+        ( <http://purl.obolibrary.org/obo/uberon/uberon-base.owl> ) 
+        ( <http://purl.obolibrary.org/obo/pcl/pcl-base.owl> ) 
+        ( <http://purl.obolibrary.org/obo/cl/cl-base.owl> )
+      }
+      ?ontology owl:versionIRI ?ontologyVersionIri .
+    }
+  }
+
+  {
+    SELECT * WHERE {
+      VALUES (?cl_vocab) {
+        ( cl_owl: ) ( pcl_owl: )
+      }
+
+      # Limit terms to uberon and cl
+      ?as_child rdfs:isDefinedBy uberon_owl: .
+      ?as_parent rdfs:isDefinedBy uberon_owl: .
+      ?ct rdfs:isDefinedBy ?cl_vocab .
+
+      # Get Labels
+      {
+        ?as_child rdfs:label ?as_child_label .
+        ?as_parent rdfs:label ?as_parent_label .
+        ?ct rdfs:label ?ct_label .
+      }
+
+      GRAPH <http://reasoner.renci.org/nonredundant> {
+        ?as_child part_of: ?as_parent .
+      }
+      GRAPH <http://reasoner.renci.org/nonredundant> {
+        ?ct part_of: ?as_child .
+      }
+    }
+  }
+
+  {
+    SELECT * WHERE {
+      VALUES (?cl_vocab) {
+        ( cl_owl: ) ( pcl_owl: )
+      }
+
+      # Limit terms to uberon and cl
+      ?ct_parent rdfs:isDefinedBy ?cl_vocab .
+      ?ct_child rdfs:isDefinedBy ?cl_vocab .
+
+      # Get Labels
+      {
+        ?ct_child rdfs:label ?ct_child_label .
+        ?ct_parent rdfs:label ?ct_parent_label .
+      }
+
+      GRAPH <http://reasoner.renci.org/nonredundant> {
+        ?ct_child rdfs:subClassOf ?ct_parent .
+      }
+    }
+  }
+}
