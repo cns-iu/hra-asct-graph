@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm-run-all build:graph export",
-    "build:graph": "comunica-sparql https://ubergraph.apps.renci.org/sparql -f queries/asct-graph.rq -t application/ld+json > data/asct-graph.jsonld",
+    "build:graph": "node ./src/build-asct-graph.js",
     "build:graph:local": "comunica-sparql http://localhost:8080/blazegraph/namespace/kb/sparql -f queries/asct-graph.rq -t application/ld+json > data/asct-graph.jsonld",
     "export": "npm-run-all export:*",
     "export:nodes": "comunica-sparql-file ./data/asct-graph.jsonld -f queries/nodes.rq -t text/csv > data/asct-graph.nodes.csv",
